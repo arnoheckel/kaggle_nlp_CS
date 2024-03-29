@@ -22,9 +22,9 @@ def labelling_test_set():
 
     #Introduction prompt
 
-    intro_prompt = """You're an assistant that can perfectly label sentences you're given, with one the following labels :
-    [politics;health;finance;travel;food;education;environment;fashion;science;sports;technology;entertainment]
-    Your answers MUST always be a SINGLE WORD corresponding to one label of the previous list that best describes the following sentence :"""
+    # intro_prompt = """You're an assistant that can perfectly label sentences you're given, with one the following labels :
+    # [politics;health;finance;travel;food;education;environment;fashion;science;sports;technology;entertainment]
+    # Your answers MUST always be a SINGLE WORD corresponding to one label of the previous list that best describes the following sentence :"""
 
 
     #create a list of prompts from a .txt file 
@@ -32,20 +32,20 @@ def labelling_test_set():
         prompts = file.readlines()
 
 
-    url = "http://51.178.94.112:10464/api/generate"
-    auth = ("angry_faraday", "mZQNHN1X7U")
+    url = "http://angry_faraday:mZQNHN1X7U@51.75.196.122:10149/api/generate"
+    #auth = ("angry_faraday", "mZQNHN1X7U")
     headers = {"Content-Type": "application/json"}
 
     for prompt in prompts:
         print(prompt)
         data = {
-            "model": "mixtral:latest",
-            "prompt": intro_prompt + prompt,
+            "model": "mixtral",
+            "prompt": prompt,
             "stream": False,
         }
         
 
-        response = requests.post(url, json=data, headers=headers, auth=auth)
+        response = requests.post(url, json=data, headers=headers)
         
         # Check if the request was successful
         if response.status_code == 200:
