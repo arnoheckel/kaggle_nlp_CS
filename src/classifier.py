@@ -18,10 +18,6 @@ DEFAULT_PARAM_GRID = {
     "randomforest": {"n_estimators": [5,10,20,50,100], "max_depth": [5,10,20,50,100]},
 }
 
-
-
-
-
 class DNNClassifier(nn.Module):
     def __init__(self,n_classes:int,input_size:int=768):
         super().__init__()
@@ -37,9 +33,44 @@ class DNNClassifier(nn.Module):
         logits = self.linear2(x)
         return logits
     
+    def predict(self, X: np.ndarray) -> list  :
+        """Method to perform inference on new data X (list of string sentences
+        Returns the predicted labels
+        """
+        self.eval()
+        with torch.no_grad():
+            X = torch.tensor(X).float()
+            logits = self.forward(X)
+            predictions = torch.argmax(logits, dim=1)
+        return predictions.numpy()
+    
+    def evaluate_classifier(
+        self, X_test: np.ndarray, y_test: list
+    ):
+        """Methode to evaluate the trained classifier on the test set.
 
+        Args:
+            X_test (np.ndarray): Array of embeddings of the test data.
+            y_test (List[str]): Labels of the test data.
 
+        Returns:
+            Union[List[str], str, np.ndarray]: Predicted labels, classification report, confusion matrix
+            and custom weighted f1-score (weighted by CLASS_WEIGHTS).
+        """
+        self.eval()
+        y_pred = self.predict(X_test)
+        report = classification_report(y_test, y_pred, zero_division=np.nan, output_dict=True)
+        accuracy_score = round(report["accuracy"], 2)
+        print("Accuracy: " + str(accuracy_score))
 
+        conf_matrix = confusion_matrix(y_test, y_pred)
+        return (
+            y_pred,
+            classification_report(y_test, y_pred, zero_division=np.nan),
+            conf_matrix
+        )
+    
+    
 class FewShotClassifier:
     """
     This class is a few-shot classifier.
